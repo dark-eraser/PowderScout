@@ -29,50 +29,41 @@ body {
 }
 
 .header {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .header h1 {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   color: var(--text-primary);
+  letter-spacing: -0.01rem;
 }
 
 .header-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   align-items: center;
 }
 
 .radius-select {
-  padding: 0.3rem 0.5rem;
+  padding: 0.25rem 0.4rem;
   border-radius: 0.4rem;
   border: 1px solid var(--border-color);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
   background: white;
   cursor: pointer;
   outline: none;
 }
 
-.radius-select:hover {
-  border-color: var(--accent-blue);
-}
-
-.location-bar {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-}
-
 .day-selector {
   display: flex;
-  background: #f1f5f9;
-  border-radius: 0.6rem;
-  padding: 0.25rem;
+  background: #edf2f7;
+  border-radius: 99px;
+  padding: 3px;
   margin-bottom: 0.75rem;
 }
 
@@ -80,39 +71,37 @@ body {
   flex: 1;
   border: none;
   background: transparent;
-  padding: 0.4rem;
-  font-size: 0.7rem;
-  font-weight: 600;
+  padding: 6px 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
   color: var(--text-secondary);
   cursor: pointer;
-  border-radius: 0.4rem;
+  border-radius: 99px;
   transition: all 0.2s;
   text-transform: uppercase;
-  letter-spacing: 0.02rem;
 }
 
 .day-btn.active {
   background: white;
   color: var(--accent-blue);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .sort-bar {
   display: flex;
-  gap: 0.5rem;
+  gap: 6px;
   margin-bottom: 1rem;
-  padding: 0 0.25rem;
 }
 
 .sort-btn {
   flex: 1;
-  padding: 0.4rem;
+  padding: 5px;
   border: 1px solid var(--border-color);
-  border-radius: 0.4rem;
+  border-radius: 8px;
   background: white;
   cursor: pointer;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.7rem;
+  font-weight: 600;
   color: var(--text-secondary);
   transition: all 0.2s;
 }
@@ -123,24 +112,108 @@ body {
   border-color: var(--accent-blue);
 }
 
-.search-input {
-  flex: 1;
-  padding: 0.5rem 0.75rem;
+.resort-card {
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  outline: none;
-  transition: border-color 0.2s;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  position: relative;
+  transition: transform 0.2s;
 }
 
-.search-input:focus {
-  border-color: var(--accent-blue);
+.rank-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--accent-blue);
+  background: #f0f9ff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fresh-badge {
+  color: #059669;
+  background: #ecfdf5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02rem;
+  border: 1px solid #d1fae5;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.8;
+  }
+}
+
+.resort-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  width: 70%;
+  line-height: 1.25;
+}
+
+.resort-dist {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+}
+
+.weather-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+}
+
+.weather-val {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.snow-stack {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-main);
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-top: 4px;
 }
 
 .btn {
-  padding: 0.5rem;
+  width: 34px;
+  height: 34px;
   border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
+  border-radius: 8px;
   background: white;
   cursor: pointer;
   display: flex;
@@ -150,73 +223,30 @@ body {
 }
 
 .btn:hover {
-  background: #f1f5f9;
+  background: #f8fafc;
+  border-color: var(--accent-blue);
 }
 
-.btn-primary {
-  background: var(--accent-blue);
-  color: white;
-  border: none;
-}
-
-.btn-primary:hover {
-  background: var(--accent-blue-hover);
-}
-
-.resort-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
-  padding: 1rem;
-  margin-bottom: 0.75rem;
-  position: relative;
-}
-
-.rank-indicator {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--accent-blue);
-  text-transform: uppercase;
-}
-
-.resort-name {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-  width: 80%;
-}
-
-.resort-dist {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.75rem;
-}
-
-.weather-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  border-top: 1px solid var(--border-color);
-  padding-top: 0.75rem;
-}
-
-.weather-item {
+.location-bar {
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-.weather-val {
-  color: var(--text-primary);
-  font-weight: 500;
+.search-input {
+  flex: 1;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
 }
 
 .resort-link {

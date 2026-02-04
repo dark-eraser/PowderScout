@@ -4,14 +4,17 @@ export interface SkiResort {
     latitude: number;
     longitude: number;
     liftCount: number;
+    liftBreakdown?: Record<string, number>;
     website?: string;
     peakElevation?: number;
+    baseElevation?: number;
     distance?: number;
 }
 
 export interface WeatherData {
     snowfall: number;
     snowDepth: number;
+    baseSnowDepth?: number | undefined;
     windSpeed: number;
     weatherCode: number;
     tempMax: number;

@@ -79,7 +79,7 @@ function App() {
             const selection = nearby.slice(0, limit);
             const withWeather = await Promise.all(
                 selection.map(async (resort: any) => {
-                    const forecast = await WeatherService.getForecast(resort.latitude, resort.longitude, resort.peakElevation);
+                    const forecast = await WeatherService.getForecast(resort.latitude, resort.longitude, resort.peakElevation, resort.baseElevation);
                     return { ...resort, forecast };
                 })
             );
@@ -226,6 +226,9 @@ function App() {
                     {sortedResorts.map((resort, index) => (
                         <div key={resort.id} className="resort-card">
                             <div className="rank-indicator">
+                                {resort.weather && resort.weather.snowfall > 0 && (
+                                    <span className="fresh-badge" title={`${resort.weather.snowfall}cm fresh snow!`}>Fresh ❄️</span>
+                                )}
                                 {sortBy === 'rank' ? `Rank #${index + 1}` :
                                     sortBy === 'snow' ? `${resort.weather?.snowDepth}cm` :
                                         `${resort.liftCount} Lifts`}
@@ -243,29 +246,32 @@ function App() {
 
                             {resort.weather && (
                                 <div className="weather-grid">
-                                    <div className="weather-item">
+                                    <div className="weather-item" title={resort.liftBreakdown ? Object.entries(resort.liftBreakdown).map(([k, v]) => `${v} ${k.replace(/_/g, ' ')}`).join(', ') : ''}>
                                         <Map size={14} />
-                                        <span>Lifts: <span className="weather-val">{resort.liftCount ?? '-'}</span></span>
+                                        <span>Lifts <span className="weather-val">{resort.liftCount}</span></span>
                                     </div>
                                     <div className="weather-item">
                                         {resort.weather.weatherCode <= 3 ? <Sun size={14} /> : <Snowflake size={14} />}
                                         <span className="weather-val">{getWeatherDescription(resort.weather.weatherCode)}</span>
                                     </div>
                                     <div className="weather-item">
-                                        <Snowflake size={14} />
-                                        <span>Peak: <span className="weather-val">{resort.weather.snowDepth}cm</span> {resort.peakElevation ? `@ ${resort.peakElevation}m` : ''}</span>
-                                    </div>
-                                    <div className="weather-item">
-                                        <Snowflake size={14} />
-                                        <span>Fresh: <span className="weather-val">{resort.weather.snowfall}cm</span></span>
-                                    </div>
-                                    <div className="weather-item">
                                         <Wind size={14} />
-                                        <span>Wind: <span className="weather-val">{resort.weather.windSpeed}km/h</span></span>
+                                        <span>Wind <span className="weather-val">{resort.weather.windSpeed}km/h</span></span>
                                     </div>
                                     <div className="weather-item">
                                         <CloudRain size={14} />
-                                        <span>Temp: <span className="weather-val">{resort.weather.tempMax}°C</span></span>
+                                        <span>Temp <span className="weather-val">{resort.weather.tempMax}°C</span></span>
+                                    </div>
+
+                                    <div className="snow-stack">
+                                        <div className="weather-item">
+                                            <Snowflake size={14} />
+                                            <span>Peak Snow <span className="weather-val">{resort.weather.snowDepth}cm</span> {resort.peakElevation ? `@ ${resort.peakElevation}m` : ''}</span>
+                                        </div>
+                                        <div className="weather-item">
+                                            <Snowflake size={14} />
+                                            <span>Base Snow <span className="weather-val">{resort.weather.baseSnowDepth ?? 0}cm</span> {resort.baseElevation ? `@ ${resort.baseElevation}m` : ''}</span>
+                                        </div>
                                     </div>
                                 </div>
                             )}

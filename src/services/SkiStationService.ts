@@ -14,11 +14,11 @@ export class SkiStationService {
                 const cached = await chrome.storage.local.get('ski_resorts');
                 if (cached.ski_resorts && Array.isArray(cached.ski_resorts) && cached.ski_resorts.length > 0) {
                     // Cache validation: ensure the first resort has required new properties
-                    if ('liftCount' in cached.ski_resorts[0] && 'website' in cached.ski_resorts[0] && 'peakElevation' in cached.ski_resorts[0]) {
+                    if ('liftCount' in cached.ski_resorts[0] && 'website' in cached.ski_resorts[0] && 'peakElevation' in cached.ski_resorts[0] && 'baseElevation' in cached.ski_resorts[0]) {
                         this.resorts = cached.ski_resorts;
                         return this.resorts;
                     } else {
-                        console.log('Stale cache detected (missing liftCount), clearing...');
+                        console.log('Stale cache detected (missing baseElevation), clearing...');
                         await chrome.storage.local.remove('ski_resorts');
                     }
                 }
@@ -34,10 +34,19 @@ export class SkiStationService {
                     const liftStats = f.properties.statistics?.lifts?.byType || {};
                     const liftCount = Object.values(liftStats).reduce((sum: number, type: any) => sum + (type.count || 0), 0);
 
+                    const liftBreakdown: Record<string, number> = {};
+                    Object.entries(liftStats).forEach(([type, data]: [string, any]) => {
+                        if (data.count > 0) liftBreakdown[type] = data.count;
+                    });
+
                     // Extract peak elevation (highest maxElevation among all lift types)
                     const peakElevation = Object.values(liftStats).reduce((max: number, type: any) => {
                         return Math.max(max, type.maxElevation || 0);
                     }, 0);
+
+                    // Extract base elevation (lowest minElevation among all lift types)
+                    const elevations = Object.values(liftStats).map((type: any) => type.minElevation).filter(e => e !== undefined && e > 0);
+                    const baseElevation = elevations.length > 0 ? Math.min(...elevations) : (peakElevation > 0 ? peakElevation - 500 : undefined);
 
                     return {
                         id: f.properties.id,
@@ -45,8 +54,10 @@ export class SkiStationService {
                         latitude: f.geometry.coordinates[1],
                         longitude: f.geometry.coordinates[0],
                         liftCount: liftCount,
+                        liftBreakdown,
                         website: f.properties.websites?.[0],
                         peakElevation: peakElevation > 0 ? Math.round(peakElevation) : undefined,
+                        baseElevation: baseElevation ? Math.round(baseElevation) : undefined,
                     };
                 })
                 .filter((r: any) => r.name !== "Unknown Resort" && r.liftCount > 10);
