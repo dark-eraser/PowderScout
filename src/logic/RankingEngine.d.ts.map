@@ -1,0 +1,1 @@
+{"version":3,"file":"RankingEngine.d.ts","sourceRoot":"","sources":["RankingEngine.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAe,MAAM,mBAAmB,CAAC;AAE9D,qBAAa,aAAa;IACtB,MAAM,CAAC,WAAW,CAAC,MAAM,EAAE,YAAY,GAAG,MAAM;IA6BhD,MAAM,CAAC,WAAW,CAAC,OAAO,EAAE,YAAY,EAAE,GAAG,YAAY,EAAE;CAK9D"}

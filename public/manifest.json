@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Ski Weather Finder",
+  "version": "1.0.0",
+  "description": "Find the best ski conditions near you.",
+  "permissions": [
+    "geolocation",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://tiles.openskimap.org/*",
+    "https://api.open-meteo.com/*",
+    "https://geocoding-api.open-meteo.com/*"
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "assets/ski.png",
+      "32": "assets/ski.png",
+      "48": "assets/ski.png",
+      "128": "assets/ski.png"
+    }
+  },
+  "icons": {
+    "16": "assets/ski.png",
+    "32": "assets/ski.png",
+    "48": "assets/ski.png",
+    "128": "assets/ski.png"
+  }
+}
