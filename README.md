@@ -32,7 +32,7 @@ A modern Chrome extension that helps you find the best ski conditions near you (
 1.  **Clone the repository**:
     ```bash
     git clone [repository-url]
-    cd SkiWeather
+    cd PowderScout
     ```
 2.  **Install dependencies**:
     ```bash

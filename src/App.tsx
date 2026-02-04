@@ -15,6 +15,8 @@ function App() {
     const [searchResults, setSearchResults] = useState<LocationResult[]>([]);
     const [currentLocationName, setCurrentLocationName] = useState('Nearby');
     const [sortBy, setSortBy] = useState<'rank' | 'snow' | 'lifts'>('rank');
+    const [radius, setRadius] = useState<number>(100);
+    const [lastLoc, setLastLoc] = useState<{ lat: number, lon: number, name: string } | null>(null);
     const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const sortedResorts = [...resorts].sort((a, b) => {
@@ -23,14 +25,27 @@ function App() {
         return 0; // 'rank' is already sorted by RankingEngine
     });
 
-    const loadData = async (lat: number, lon: number, name: string = 'Nearby') => {
+    // Load settings
+    useEffect(() => {
+        if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+            chrome.storage.local.get(['radius'], (result) => {
+                if (result.radius !== undefined) {
+                    setRadius(Number(result.radius));
+                }
+            });
+        }
+    }, []);
+
+    const loadData = async (lat: number, lon: number, name: string = 'Nearby', targetRadius?: number) => {
         try {
             setLoading(true);
             setError(null);
             setCurrentLocationName(name);
+            setLastLoc({ lat, lon, name });
 
+            const searchRadius = targetRadius || radius;
             await SkiStationService.fetchResorts();
-            let nearby = SkiStationService.getNearbyResorts(lat, lon, 100);
+            let nearby = SkiStationService.getNearbyResorts(lat, lon, searchRadius);
 
             if (nearby.length === 0) {
                 nearby = SkiStationService.getNearbyResorts(lat, lon, 500);
@@ -46,9 +61,10 @@ function App() {
                 return;
             }
 
-            const top5 = nearby.slice(0, 5);
+            const limit = 15;
+            const selection = nearby.slice(0, limit);
             const withWeather = await Promise.all(
-                top5.map(async (resort: any) => {
+                selection.map(async (resort: any) => {
                     const weather = await WeatherService.getForecast(resort.latitude, resort.longitude, resort.peakElevation);
                     return { ...resort, weather };
                 })
@@ -104,13 +120,34 @@ function App() {
         loadData(loc.latitude, loc.longitude, loc.name);
     };
 
+    const handleRadiusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newRadius = parseInt(e.target.value);
+        setRadius(newRadius);
+        if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+            chrome.storage.local.set({ radius: newRadius });
+        }
+        if (lastLoc) {
+            loadData(lastLoc.lat, lastLoc.lon, lastLoc.name, newRadius);
+        }
+    };
+
     return (
         <div className="container">
             <header className="header">
-                <h1>{currentLocationName} Slopes</h1>
-                <button className="btn" onClick={handleGeolocate} title="Use my current location">
-                    <Navigation size={16} />
-                </button>
+                <h1>PowderScout</h1>
+                <div className="header-actions">
+                    <select className="radius-select" value={radius} onChange={handleRadiusChange} title="Search radius">
+                        <option value="50">50km</option>
+                        <option value="100">100km</option>
+                        <option value="150">150km</option>
+                        <option value="200">200km</option>
+                        <option value="300">300km</option>
+                        <option value="400">400km</option>
+                    </select>
+                    <button className="btn" onClick={handleGeolocate} title="Use my current location">
+                        <Navigation size={16} />
+                    </button>
+                </div>
             </header>
 
             <div className="location-bar" style={{ position: 'relative' }}>

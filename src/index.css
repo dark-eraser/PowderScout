@@ -41,6 +41,27 @@ body {
   color: var(--text-primary);
 }
 
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.radius-select {
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--border-color);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: white;
+  cursor: pointer;
+  outline: none;
+}
+
+.radius-select:hover {
+  border-color: var(--accent-blue);
+}
+
 .location-bar {
   display: flex;
   gap: 0.5rem;

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Ski Weather Finder",
+  "name": "PowderScout",
   "version": "1.0.0",
   "description": "Find the best ski conditions near you.",
   "permissions": [
