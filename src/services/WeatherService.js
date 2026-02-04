@@ -7,7 +7,7 @@ export class WeatherService {
             daily: 'snowfall_sum,temperature_2m_max,temperature_2m_min',
             hourly: 'wind_speed_10m,snow_depth,weather_code',
             timezone: 'auto',
-            forecast_days: '1',
+            forecast_days: '3',
         };
         if (elevation !== undefined) {
             params.elevation = elevation.toString();
@@ -18,14 +18,20 @@ export class WeatherService {
             const data = await response.json();
             if (!data.daily || !data.hourly)
                 return null;
-            return {
-                snowfall: data.daily.snowfall_sum[0] || 0,
-                tempMax: data.daily.temperature_2m_max[0],
-                tempMin: data.daily.temperature_2m_min[0],
-                windSpeed: data.hourly.wind_speed_10m[0], // Current hour
-                snowDepth: Math.round((data.hourly.snow_depth[0] || 0) * 100), // Convert meters to cm and round up
-                weatherCode: data.hourly.weather_code[0],
-            };
+            const forecast = [];
+            for (let i = 0; i < 3; i++) {
+                // Noon indices: 12, 36, 60
+                const hIdx = 12 + (i * 24);
+                forecast.push({
+                    snowfall: data.daily.snowfall_sum[i] || 0,
+                    tempMax: data.daily.temperature_2m_max[i],
+                    tempMin: data.daily.temperature_2m_min[i],
+                    windSpeed: data.hourly.wind_speed_10m[hIdx],
+                    snowDepth: Math.round((data.hourly.snow_depth[hIdx] || 0) * 100),
+                    weatherCode: data.hourly.weather_code[hIdx],
+                });
+            }
+            return forecast;
         }
         catch (error) {
             console.error('Failed to fetch weather data:', error);

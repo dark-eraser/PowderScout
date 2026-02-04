@@ -9,6 +9,8 @@ import { getWeatherDescription } from './logic/WeatherCodes';
 
 function App() {
     const [resorts, setResorts] = useState<ScoredResort[]>([]);
+    const [rawResorts, setRawResorts] = useState<ScoredResort[]>([]);
+    const [forecastDay, setForecastDay] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -24,6 +26,18 @@ function App() {
         if (sortBy === 'lifts') return b.liftCount - a.liftCount;
         return 0; // 'rank' is already sorted by RankingEngine
     });
+
+    // Handle day-specific ranking
+    useEffect(() => {
+        if (rawResorts.length > 0) {
+            const mapped = rawResorts.map(r => ({
+                ...r,
+                weather: r.forecast ? r.forecast[forecastDay] : undefined
+            }));
+            const ranked = RankingEngine.rankResorts(mapped as ScoredResort[]);
+            setResorts(ranked);
+        }
+    }, [forecastDay, rawResorts]);
 
     // Load settings
     useEffect(() => {
@@ -65,13 +79,12 @@ function App() {
             const selection = nearby.slice(0, limit);
             const withWeather = await Promise.all(
                 selection.map(async (resort: any) => {
-                    const weather = await WeatherService.getForecast(resort.latitude, resort.longitude, resort.peakElevation);
-                    return { ...resort, weather };
+                    const forecast = await WeatherService.getForecast(resort.latitude, resort.longitude, resort.peakElevation);
+                    return { ...resort, forecast };
                 })
             );
 
-            const ranked = RankingEngine.rankResorts(withWeather as ScoredResort[]);
-            setResorts(ranked);
+            setRawResorts(withWeather as ScoredResort[]);
         } catch (err: any) {
             console.error(err);
             setError("Failed to load data. Please try again.");
@@ -167,6 +180,21 @@ function App() {
                         ))}
                     </div>
                 )}
+            </div>
+
+            <div className="day-selector">
+                <button
+                    className={`day-btn ${forecastDay === 0 ? 'active' : ''}`}
+                    onClick={() => setForecastDay(0)}
+                >Today</button>
+                <button
+                    className={`day-btn ${forecastDay === 1 ? 'active' : ''}`}
+                    onClick={() => setForecastDay(1)}
+                >Tomorrow</button>
+                <button
+                    className={`day-btn ${forecastDay === 2 ? 'active' : ''}`}
+                    onClick={() => setForecastDay(2)}
+                >Day After</button>
             </div>
 
             <div className="sort-bar">

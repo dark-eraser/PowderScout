@@ -18,6 +18,7 @@ export interface WeatherData {
 }
 export interface ScoredResort extends SkiResort {
     weather?: WeatherData;
+    forecast?: WeatherData[];
     score?: number;
 }
 //# sourceMappingURL=types.d.ts.map

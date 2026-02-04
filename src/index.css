@@ -68,6 +68,35 @@ body {
   margin-bottom: 0.75rem;
 }
 
+.day-selector {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 0.6rem;
+  padding: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.day-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 0.4rem;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.02rem;
+}
+
+.day-btn.active {
+  background: white;
+  color: var(--accent-blue);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
 .sort-bar {
   display: flex;
   gap: 0.5rem;

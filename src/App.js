@@ -8,6 +8,8 @@ import { Wind, Snowflake, CloudRain, Sun, Map, Navigation } from 'lucide-react';
 import { getWeatherDescription } from './logic/WeatherCodes';
 function App() {
     const [resorts, setResorts] = useState([]);
+    const [rawResorts, setRawResorts] = useState([]);
+    const [forecastDay, setForecastDay] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -24,6 +26,17 @@ function App() {
             return b.liftCount - a.liftCount;
         return 0; // 'rank' is already sorted by RankingEngine
     });
+    // Handle day-specific ranking
+    useEffect(() => {
+        if (rawResorts.length > 0) {
+            const mapped = rawResorts.map(r => ({
+                ...r,
+                weather: r.forecast ? r.forecast[forecastDay] : undefined
+            }));
+            const ranked = RankingEngine.rankResorts(mapped);
+            setResorts(ranked);
+        }
+    }, [forecastDay, rawResorts]);
     // Load settings
     useEffect(() => {
         if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
@@ -57,11 +70,10 @@ function App() {
             const limit = 15;
             const selection = nearby.slice(0, limit);
             const withWeather = await Promise.all(selection.map(async (resort) => {
-                const weather = await WeatherService.getForecast(resort.latitude, resort.longitude, resort.peakElevation);
-                return { ...resort, weather };
+                const forecast = await WeatherService.getForecast(resort.latitude, resort.longitude, resort.peakElevation);
+                return { ...resort, forecast };
             }));
-            const ranked = RankingEngine.rankResorts(withWeather);
-            setResorts(ranked);
+            setRawResorts(withWeather);
         }
         catch (err) {
             console.error(err);
@@ -113,7 +125,7 @@ function App() {
             loadData(lastLoc.lat, lastLoc.lon, lastLoc.name, newRadius);
         }
     };
-    return (_jsxs("div", { className: "container", children: [_jsxs("header", { className: "header", children: [_jsx("h1", { children: "PowderScout" }), _jsxs("div", { className: "header-actions", children: [_jsxs("select", { className: "radius-select", value: radius, onChange: handleRadiusChange, title: "Search radius", children: [_jsx("option", { value: "50", children: "50km" }), _jsx("option", { value: "100", children: "100km" }), _jsx("option", { value: "150", children: "150km" }), _jsx("option", { value: "200", children: "200km" }), _jsx("option", { value: "300", children: "300km" }), _jsx("option", { value: "400", children: "400km" })] }), _jsx("button", { className: "btn", onClick: handleGeolocate, title: "Use my current location", children: _jsx(Navigation, { size: 16 }) })] })] }), _jsxs("div", { className: "location-bar", style: { position: 'relative' }, children: [_jsx("input", { type: "text", className: "search-input", placeholder: "Search city (e.g. Geneva)", value: searchQuery, onChange: handleSearchChange }), searchResults.length > 0 && (_jsx("div", { className: "search-results", children: searchResults.map((loc, i) => (_jsxs("div", { className: "search-result-item", onClick: () => selectLocation(loc), children: [loc.name, ", ", loc.admin1 ? `${loc.admin1}, ` : '', loc.country] }, i))) }))] }), _jsxs("div", { className: "sort-bar", children: [_jsx("button", { className: `sort-btn ${sortBy === 'rank' ? 'active' : ''}`, onClick: () => setSortBy('rank'), children: "Best" }), _jsx("button", { className: `sort-btn ${sortBy === 'snow' ? 'active' : ''}`, onClick: () => setSortBy('snow'), children: "Snow" }), _jsx("button", { className: `sort-btn ${sortBy === 'lifts' ? 'active' : ''}`, onClick: () => setSortBy('lifts'), children: "Lifts" })] }), loading ? (_jsxs("div", { className: "loading", children: [_jsx("div", { className: "spinner" }), _jsx("p", { children: "Analyzing conditions..." })] })) : error ? (_jsx("div", { className: "error", children: _jsx("p", { children: error }) })) : (_jsx("div", { className: "resort-list", children: sortedResorts.map((resort, index) => (_jsxs("div", { className: "resort-card", children: [_jsx("div", { className: "rank-indicator", children: sortBy === 'rank' ? `Rank #${index + 1}` :
+    return (_jsxs("div", { className: "container", children: [_jsxs("header", { className: "header", children: [_jsx("h1", { children: "PowderScout" }), _jsxs("div", { className: "header-actions", children: [_jsxs("select", { className: "radius-select", value: radius, onChange: handleRadiusChange, title: "Search radius", children: [_jsx("option", { value: "50", children: "50km" }), _jsx("option", { value: "100", children: "100km" }), _jsx("option", { value: "150", children: "150km" }), _jsx("option", { value: "200", children: "200km" }), _jsx("option", { value: "300", children: "300km" }), _jsx("option", { value: "400", children: "400km" })] }), _jsx("button", { className: "btn", onClick: handleGeolocate, title: "Use my current location", children: _jsx(Navigation, { size: 16 }) })] })] }), _jsxs("div", { className: "location-bar", style: { position: 'relative' }, children: [_jsx("input", { type: "text", className: "search-input", placeholder: "Search city (e.g. Geneva)", value: searchQuery, onChange: handleSearchChange }), searchResults.length > 0 && (_jsx("div", { className: "search-results", children: searchResults.map((loc, i) => (_jsxs("div", { className: "search-result-item", onClick: () => selectLocation(loc), children: [loc.name, ", ", loc.admin1 ? `${loc.admin1}, ` : '', loc.country] }, i))) }))] }), _jsxs("div", { className: "day-selector", children: [_jsx("button", { className: `day-btn ${forecastDay === 0 ? 'active' : ''}`, onClick: () => setForecastDay(0), children: "Today" }), _jsx("button", { className: `day-btn ${forecastDay === 1 ? 'active' : ''}`, onClick: () => setForecastDay(1), children: "Tomorrow" }), _jsx("button", { className: `day-btn ${forecastDay === 2 ? 'active' : ''}`, onClick: () => setForecastDay(2), children: "Day After" })] }), _jsxs("div", { className: "sort-bar", children: [_jsx("button", { className: `sort-btn ${sortBy === 'rank' ? 'active' : ''}`, onClick: () => setSortBy('rank'), children: "Best" }), _jsx("button", { className: `sort-btn ${sortBy === 'snow' ? 'active' : ''}`, onClick: () => setSortBy('snow'), children: "Snow" }), _jsx("button", { className: `sort-btn ${sortBy === 'lifts' ? 'active' : ''}`, onClick: () => setSortBy('lifts'), children: "Lifts" })] }), loading ? (_jsxs("div", { className: "loading", children: [_jsx("div", { className: "spinner" }), _jsx("p", { children: "Analyzing conditions..." })] })) : error ? (_jsx("div", { className: "error", children: _jsx("p", { children: error }) })) : (_jsx("div", { className: "resort-list", children: sortedResorts.map((resort, index) => (_jsxs("div", { className: "resort-card", children: [_jsx("div", { className: "rank-indicator", children: sortBy === 'rank' ? `Rank #${index + 1}` :
                                 sortBy === 'snow' ? `${resort.weather?.snowDepth}cm` :
                                     `${resort.liftCount} Lifts` }), _jsx("h2", { className: "resort-name", children: resort.website ? (_jsx("a", { href: resort.website, target: "_blank", rel: "noopener noreferrer", className: "resort-link", children: resort.name })) : (resort.name) }), _jsxs("p", { className: "resort-dist", children: [resort.distance?.toFixed(1), " km away"] }), resort.weather && (_jsxs("div", { className: "weather-grid", children: [_jsxs("div", { className: "weather-item", children: [_jsx(Map, { size: 14 }), _jsxs("span", { children: ["Lifts: ", _jsx("span", { className: "weather-val", children: resort.liftCount ?? '-' })] })] }), _jsxs("div", { className: "weather-item", children: [resort.weather.weatherCode <= 3 ? _jsx(Sun, { size: 14 }) : _jsx(Snowflake, { size: 14 }), _jsx("span", { className: "weather-val", children: getWeatherDescription(resort.weather.weatherCode) })] }), _jsxs("div", { className: "weather-item", children: [_jsx(Snowflake, { size: 14 }), _jsxs("span", { children: ["Peak: ", _jsxs("span", { className: "weather-val", children: [resort.weather.snowDepth, "cm"] }), " ", resort.peakElevation ? `@ ${resort.peakElevation}m` : ''] })] }), _jsxs("div", { className: "weather-item", children: [_jsx(Snowflake, { size: 14 }), _jsxs("span", { children: ["Fresh: ", _jsxs("span", { className: "weather-val", children: [resort.weather.snowfall, "cm"] })] })] }), _jsxs("div", { className: "weather-item", children: [_jsx(Wind, { size: 14 }), _jsxs("span", { children: ["Wind: ", _jsxs("span", { className: "weather-val", children: [resort.weather.windSpeed, "km/h"] })] })] }), _jsxs("div", { className: "weather-item", children: [_jsx(CloudRain, { size: 14 }), _jsxs("span", { children: ["Temp: ", _jsxs("span", { className: "weather-val", children: [resort.weather.tempMax, "\u00B0C"] })] })] })] }))] }, resort.id))) }))] }));
 }

@@ -20,5 +20,6 @@ export interface WeatherData {
 
 export interface ScoredResort extends SkiResort {
     weather?: WeatherData;
+    forecast?: WeatherData[];
     score?: number;
 }
